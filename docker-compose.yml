@@ -1,0 +1,13 @@
+version: '3'
+
+services:
+  server:
+    container_name: semaphore-server
+    image: avidian/semaphore-server
+    build: .
+    volumes:
+      - .:/home/node
+    ports:
+      - ${RECEIVER_PORT:-3535}:${RECEIVER_PORT:-3535}
+      - ${VIEWER_PORT:-8585}:${VIEWER_PORT:-8585}
+    restart: unless-stopped

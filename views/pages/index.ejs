@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<%- include('../partials/head'); %>
+	</head>
+	<body>
+		<%- include('../partials/header'); %>
+
+		<main class="container pt-5">
+			<div class="jumbotron">
+				<h1 class="mb-5 d-flex align-items-center w-100">
+					Messages
+					<button id="btn-refresh" class="btn btn-dark btn-sm ms-auto">Refresh</button>
+				</h1>
+				<ul class="list-group">
+					<% messages.forEach(message => { %>
+					<li class="list-group-item" id="item-<%= message.id %>">
+						<div class="row">
+							<div class="col-11">
+								<h6><%= message.recipient %></h6>
+							</div>
+							<div class="col-1 d-flex">
+								<button
+									data-id="<%= message.id %>"
+									class="btn btn-danger btn-sm ms-auto p-0 d-flex align-items-center justify-content-center btn-delete"
+									style="width: 32px !important; height: 32px !important"
+								>
+									<i class="material-icons">delete</i>
+								</button>
+							</div>
+						</div>
+						<p class="mb-0"><%= message.message %></p>
+					</li>
+					<% }); %>
+				</ul>
+			</div>
+		</main>
+
+		<footer class="footer fixed-bottom"><%- include('../partials/footer'); %></footer>
+		<script defer>
+			const button = document.getElementById('btn-refresh');
+
+			button.onclick = (e) => {
+				e.preventDefault();
+				window.location.reload();
+			};
+
+			const buttons = document.querySelectorAll('.btn-delete');
+
+			buttons.forEach((button) => {
+				button.onclick = async (e) => {
+					e.preventDefault();
+					const id = button.getAttribute('data-id');
+					await fetch(`/api/messages/${id}/delete`, {
+						method: 'POST',
+					});
+
+					const item = document.getElementById(`item-${id}`);
+
+					item.remove();
+				};
+			});
+		</script>
+	</body>
+</html>

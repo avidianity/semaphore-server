@@ -9,6 +9,21 @@ lerna-debug.log*
 # Diagnostic reports (https://nodejs.org/api/report.html)
 report.[0-9]*.[0-9]*.[0-9]*.[0-9]*.json
 
+# Keep environment variables out of version control
+.env
+
+.sqlite
+
+.config
+
+.npm
+
+.yarnrc
+
+.cache
+
+.bash_history
+
 # Runtime data
 pids
 *.pid
