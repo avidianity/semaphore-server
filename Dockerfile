@@ -1,9 +1,8 @@
 FROM node:16
 
-USER node
+RUN chmod -R 777 /home/node
 
-ENV NPM_CONFIG_PREFIX=/home/node/.npm-global
-ENV PATH=$PATH:/home/node/.npm-global/bin
+USER node
 
 WORKDIR /home/node
 
