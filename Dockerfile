@@ -14,5 +14,9 @@ RUN yarn
 
 COPY . .
 
+EXPOSE 3535
+
+EXPOSE 8585
+
 CMD [ "yarn", "start" ]
 
