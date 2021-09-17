@@ -10,4 +10,4 @@ services:
     ports:
       - ${RECEIVER_PORT:-3535}:${RECEIVER_PORT:-3535}
       - ${VIEWER_PORT:-8585}:${VIEWER_PORT:-8585}
-    restart: unless-stopped
+    restart: always

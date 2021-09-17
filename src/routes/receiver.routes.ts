@@ -7,112 +7,127 @@ import { Account, SenderName } from '../contracts';
 const router = Router();
 
 router.post('/account', (_, res) => {
-	return res.json({
-		account_id: faker.datatype.number(1000),
-		account_name: faker.random.words(faker.datatype.number(5)),
-		status: faker.random.words(faker.datatype.number(5)),
-		credit_balance: faker.datatype.number(1000),
-	});
+    return res.json({
+        account_id: faker.datatype.number(1000),
+        account_name: faker.random.words(faker.datatype.number(5)),
+        status: faker.random.words(faker.datatype.number(5)),
+        credit_balance: faker.datatype.number(1000),
+    });
 });
 
 router.post(
-	'/messages',
-	[body('message').isString().notEmpty(), body('number').isString().notEmpty(), body('sendername').isString().notEmpty()],
-	async (req: Request, res: Response) => {
-		const errors = validationResult(req);
+    '/messages',
+    [
+        body('message').isString().notEmpty(),
+        body('number').isString().notEmpty(),
+        body('sendername').isString().notEmpty(),
+    ],
+    async (req: Request, res: Response) => {
+        const errors = validationResult(req);
 
-		if (!errors.isEmpty()) {
-			return res.status(422).json({ errors: errors.array() });
-		}
+        if (!errors.isEmpty()) {
+            return res.status(422).json({ errors: errors.array() });
+        }
 
-		const knex: Knex = req.app.get('knex');
+        const numbers: string[] = req.body.number.split(',');
 
-		const data = {
-			user_id: faker.datatype.number(1000),
-			user: faker.random.words(faker.datatype.number(5)),
-			account_id: faker.datatype.number(1000),
-			account: faker.random.words(faker.datatype.number(5)),
-			recipient: `${req.body.number}`,
-			sender_name: req.body.sendername,
-			network: faker.random.words(1),
-			status: 'Sent',
-			type: faker.random.words(faker.datatype.number(5)),
-			source: faker.random.words(faker.datatype.number(5)),
-			message: req.body.message,
-		};
+        const knex: Knex = req.app.get('knex');
 
-		const [id] = await knex('messages').insert(data);
+        const ids = await Promise.all(
+            numbers.map(async (number) => {
+                const data = {
+                    user_id: faker.datatype.number(1000),
+                    user: faker.random.words(faker.datatype.number(5)),
+                    account_id: faker.datatype.number(1000),
+                    account: faker.random.words(faker.datatype.number(5)),
+                    recipient: `${number}`,
+                    sender_name: req.body.sendername,
+                    network: faker.random.words(1),
+                    status: 'Sent',
+                    type: faker.random.words(faker.datatype.number(5)),
+                    source: faker.random.words(faker.datatype.number(5)),
+                    message: req.body.message,
+                };
 
-		const messages = await knex('messages').select('*').where('id', id).limit(1);
+                const [id] = await knex('messages').insert(data);
 
-		return res.json([messages.first()]);
-	}
+                return id;
+            })
+        );
+
+        const messages = await knex('messages').select('*').whereIn('id', ids);
+
+        return res.json(messages);
+    }
 );
 
 router.get('/messages/:id', async (req, res) => {
-	const knex: Knex = req.app.get('knex');
+    const knex: Knex = req.app.get('knex');
 
-	const messages = await knex('messages').select('*').where('id', req.params.id).limit(1);
+    const messages = await knex('messages')
+        .select('*')
+        .where('id', req.params.id)
+        .limit(1);
 
-	if (messages.length === 0) {
-		return res.status(404).json({ message: 'Message does not exist.' });
-	}
+    if (messages.length === 0) {
+        return res.status(404).json({ message: 'Message does not exist.' });
+    }
 
-	return res.json(messages.first());
+    return res.json(messages.first());
 });
 
 router.get('/messages', async (req, res) => {
-	const knex: Knex = req.app.get('knex');
+    const knex: Knex = req.app.get('knex');
 
-	const messages = await knex('messages').select('*');
+    const messages = await knex('messages').select('*');
 
-	return res.json(messages);
+    return res.json(messages);
 });
 
 router.get('/account', async (_, res) => {
-	return res.json({
-		account_id: faker.datatype.number(1000),
-		account_name: faker.random.words(faker.datatype.number(5)),
-		status: faker.random.words(faker.datatype.number(5)),
-		credit_balance: faker.datatype.number(1000),
-	});
+    return res.json({
+        account_id: faker.datatype.number(1000),
+        account_name: faker.random.words(faker.datatype.number(5)),
+        status: faker.random.words(faker.datatype.number(5)),
+        credit_balance: faker.datatype.number(1000),
+    });
 });
 
 router.get('/users', async (req, res) => {
-	const knex: Knex = req.app.get('knex');
+    const knex: Knex = req.app.get('knex');
 
-	const users = await knex('users').select('*');
+    const users = await knex('users').select('*');
 
-	return res.json(users);
+    return res.json(users);
 });
 
 router.get('/account/sendernames', async (_, res) => {
-	const names: SenderName[] = [];
+    const names: SenderName[] = [];
 
-	for (let x = 0; x <= faker.datatype.number(30); x++) {
-		names.push({
-			name: faker.random.words(faker.datatype.number(5)),
-			status: faker.random.words(faker.datatype.number(5)),
-			created_at: new Date().toJSON(),
-		});
-	}
+    for (let x = 0; x <= faker.datatype.number(30); x++) {
+        names.push({
+            name: faker.random.words(faker.datatype.number(5)),
+            status: faker.random.words(faker.datatype.number(5)),
+            created_at: new Date().toJSON(),
+        });
+    }
 
-	return res.json(names);
+    return res.json(names);
 });
 
 router.get('/account/transactions', async (_, res) => {
-	const names: Account[] = [];
+    const names: Account[] = [];
 
-	for (let x = 0; x <= faker.datatype.number(30); x++) {
-		names.push({
-			account_id: faker.datatype.number(1000),
-			account_name: faker.random.words(faker.datatype.number(5)),
-			status: faker.random.words(faker.datatype.number(5)),
-			credit_balance: faker.datatype.number(1000),
-		});
-	}
+    for (let x = 0; x <= faker.datatype.number(30); x++) {
+        names.push({
+            account_id: faker.datatype.number(1000),
+            account_name: faker.random.words(faker.datatype.number(5)),
+            status: faker.random.words(faker.datatype.number(5)),
+            credit_balance: faker.datatype.number(1000),
+        });
+    }
 
-	return res.json(names);
+    return res.json(names);
 });
 
 export const receiverRoutes = router;
