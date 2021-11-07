@@ -1,6 +1,6 @@
 {
     "name": "@avidian/semaphore-server",
-    "version": "1.0.2",
+    "version": "1.0.3",
     "description": "A development server for receiving messages using the semaphore.co API.",
     "dependencies": {
         "@avidian/extras": "^1.0.0",

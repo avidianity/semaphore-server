@@ -20,7 +20,7 @@ router.post(
     [
         body('message').isString().notEmpty(),
         body('number').isString().notEmpty(),
-        body('sendername').isString().notEmpty(),
+        body('sendername').isString().notEmpty().optional(),
     ],
     async (req: Request, res: Response) => {
         const errors = validationResult(req);
@@ -41,7 +41,7 @@ router.post(
                     account_id: faker.datatype.number(1000),
                     account: faker.random.words(faker.datatype.number(5)),
                     recipient: `${number}`,
-                    sender_name: req.body.sendername,
+                    sender_name: req.body.sendername || 'Semaphore',
                     network: faker.random.words(1),
                     status: 'Sent',
                     type: faker.random.words(faker.datatype.number(5)),
